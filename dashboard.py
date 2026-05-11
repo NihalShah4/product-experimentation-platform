@@ -18,6 +18,12 @@ from src.metrics import (
     get_conversion_by_device
 )
 
+from src.insights import (
+    generate_experiment_insight,
+    generate_channel_insight,
+    generate_device_insight
+)
+
 st.set_page_config(
     page_title="Product Experimentation Platform",
     layout="wide"
@@ -62,6 +68,19 @@ lift = (
     / control_rate
 ) * 100
 
+experiment_insight = generate_experiment_insight(
+        p_value,
+        lift
+    )
+
+channel_insight = generate_channel_insight(
+        channel_df
+    )
+
+device_insight = generate_device_insight(
+        device_df
+    )
+
 # KPI cards
 col1, col2, col3, col4 = st.columns(4)
 
@@ -84,6 +103,14 @@ col4.metric(
     label="Treatment Lift",
     value=f"{lift:.2f}%"
 )
+
+st.header("Executive Insights")
+
+st.info(experiment_insight)
+
+st.success(channel_insight)
+
+st.warning(device_insight)
 
 # DAU chart
 dau_chart = px.line(
