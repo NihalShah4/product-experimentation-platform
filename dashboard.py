@@ -13,7 +13,9 @@ from src.retention_analysis import (
 from src.metrics import (
     get_daily_active_users,
     get_conversion_rate,
-    get_funnel_metrics
+    get_funnel_metrics,
+    get_conversion_by_channel,
+    get_conversion_by_device
 )
 
 st.set_page_config(
@@ -40,6 +42,8 @@ conversion_df = get_conversion_rate()
 funnel_df = get_funnel_metrics()
 experiment_df = get_experiment_results()
 retention_df = get_retention_data()
+channel_df = get_conversion_by_channel()
+device_df = get_conversion_by_device()
 
 # Calculate metrics
 conversion_rate = conversion_df.iloc[0]["conversion_rate"]
@@ -123,6 +127,34 @@ else:
     st.warning(
         "No statistically significant difference detected between variants."
     )
+
+st.header("Segment Performance")
+
+seg_col1, seg_col2 = st.columns(2)
+
+channel_chart = px.bar(
+    channel_df,
+    x="acquisition_channel",
+    y="conversion_rate",
+    title="Conversion Rate by Acquisition Channel"
+)
+
+device_chart = px.bar(
+    device_df,
+    x="device_type",
+    y="conversion_rate",
+    title="Conversion Rate by Device Type"
+)
+
+seg_col1.plotly_chart(
+    channel_chart,
+    use_container_width=True
+)
+
+seg_col2.plotly_chart(
+    device_chart,
+    use_container_width=True
+)
 
 # Retention section
 st.header("Retention Analysis")

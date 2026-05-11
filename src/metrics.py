@@ -65,3 +65,80 @@ def get_funnel_metrics():
     """
 
     return pd.read_sql(query, engine)
+    
+def get_conversion_by_channel():
+
+    query = """
+    WITH sessions AS (
+        SELECT
+            u.acquisition_channel,
+            e.session_id
+        FROM events e
+        JOIN users u
+            ON e.user_id = u.user_id
+        WHERE e.event_type = 'session_start'
+    ),
+
+    purchases AS (
+        SELECT DISTINCT session_id
+        FROM events
+        WHERE event_type = 'purchase'
+    )
+
+    SELECT
+        s.acquisition_channel,
+        COUNT(DISTINCT s.session_id) AS total_sessions,
+        COUNT(DISTINCT p.session_id) AS purchases,
+        ROUND(
+            COUNT(DISTINCT p.session_id)::numeric
+            /
+            COUNT(DISTINCT s.session_id),
+            4
+        ) AS conversion_rate
+    FROM sessions s
+    LEFT JOIN purchases p
+        ON s.session_id = p.session_id
+    GROUP BY s.acquisition_channel
+    ORDER BY conversion_rate DESC
+    """
+
+    return pd.read_sql(query, engine)
+
+
+def get_conversion_by_device():
+
+    query = """
+    WITH sessions AS (
+        SELECT
+            u.device_type,
+            e.session_id
+        FROM events e
+        JOIN users u
+            ON e.user_id = u.user_id
+        WHERE e.event_type = 'session_start'
+    ),
+
+    purchases AS (
+        SELECT DISTINCT session_id
+        FROM events
+        WHERE event_type = 'purchase'
+    )
+
+    SELECT
+        s.device_type,
+        COUNT(DISTINCT s.session_id) AS total_sessions,
+        COUNT(DISTINCT p.session_id) AS purchases,
+        ROUND(
+            COUNT(DISTINCT p.session_id)::numeric
+            /
+            COUNT(DISTINCT s.session_id),
+            4
+        ) AS conversion_rate
+    FROM sessions s
+    LEFT JOIN purchases p
+        ON s.session_id = p.session_id
+    GROUP BY s.device_type
+    ORDER BY conversion_rate DESC
+    """
+
+    return pd.read_sql(query, engine)
