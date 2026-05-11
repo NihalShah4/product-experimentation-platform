@@ -187,8 +187,8 @@ seg_col2.plotly_chart(
 st.header("Retention Analysis")
 
 retention_pivot = retention_df.pivot(
-    index="signup_date",
-    columns="days_since_signup",
+    index="signup_week",
+    columns="weeks_since_signup",
     values="retention_rate"
 )
 
@@ -197,15 +197,15 @@ retention_heatmap = px.imshow(
     aspect="auto",
     color_continuous_scale="Blues",
     labels=dict(
-        x="Days Since Signup",
-        y="Signup Cohort",
-        color="Retention"
+        x="Weeks Since Signup",
+        y="Signup Cohort Week",
+        color="Retention Rate"
     ),
-    title="30-Day Cohort Retention"
+    title="Weekly Cohort Retention"
 )
 
 retention_heatmap.update_layout(
-    height=600
+    height=500
 )
 
 st.plotly_chart(

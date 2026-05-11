@@ -15,21 +15,21 @@ def get_retention_data():
     WITH cohort_size AS (
 
         SELECT
-            signup_date,
+            DATE_TRUNC('week', signup_date)::date AS signup_week,
             COUNT(DISTINCT user_id) AS cohort_users
 
         FROM users
 
-        GROUP BY signup_date
+        GROUP BY DATE_TRUNC('week', signup_date)::date
     ),
 
     user_activity AS (
 
         SELECT
             u.user_id,
-            u.signup_date,
+            DATE_TRUNC('week', u.signup_date)::date AS signup_week,
             e.event_date,
-            (e.event_date - u.signup_date) AS days_since_signup
+            FLOOR((e.event_date - u.signup_date) / 7) AS weeks_since_signup
 
         FROM users u
 
@@ -40,20 +40,20 @@ def get_retention_data():
     retention_counts AS (
 
         SELECT
-            signup_date,
-            days_since_signup,
+            signup_week,
+            weeks_since_signup,
             COUNT(DISTINCT user_id) AS active_users
 
         FROM user_activity
 
-        WHERE days_since_signup BETWEEN 0 AND 30
+        WHERE weeks_since_signup BETWEEN 0 AND 8
 
-        GROUP BY signup_date, days_since_signup
+        GROUP BY signup_week, weeks_since_signup
     )
 
     SELECT
-        r.signup_date,
-        r.days_since_signup,
+        r.signup_week,
+        r.weeks_since_signup,
         ROUND(
             r.active_users::numeric
             /
@@ -64,9 +64,9 @@ def get_retention_data():
     FROM retention_counts r
 
     JOIN cohort_size c
-        ON r.signup_date = c.signup_date
+        ON r.signup_week = c.signup_week
 
-    ORDER BY r.signup_date, r.days_since_signup
+    ORDER BY r.signup_week, r.weeks_since_signup
     """
 
     return pd.read_sql(query, engine)
