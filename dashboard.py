@@ -27,6 +27,8 @@ from src.insights import (
 
 from src.anomaly_detection import detect_dau_anomalies
 
+from src.forecasting import forecast_dau
+
 st.set_page_config(
     page_title="Product Experimentation Platform",
     layout="wide"
@@ -55,6 +57,7 @@ channel_df = get_conversion_by_channel()
 device_df = get_conversion_by_device()
 funnel_conversion_df = get_funnel_conversion()
 anomaly_df = detect_dau_anomalies()
+historical_dau_df, forecast_df = forecast_dau()
 
 # Calculate metrics
 conversion_rate = conversion_df.iloc[0]["conversion_rate"]
@@ -147,6 +150,32 @@ st.plotly_chart(
 
 st.dataframe(
     anomaly_df[anomaly_df["is_anomaly"]],
+    use_container_width=True
+)
+
+st.subheader("DAU Forecast")
+
+forecast_chart = px.line(
+    historical_dau_df,
+    x="event_date",
+    y="dau",
+    title="Historical DAU with 14-Day Forecast"
+)
+
+forecast_chart.add_scatter(
+    x=forecast_df["event_date"],
+    y=forecast_df["forecasted_dau"],
+    mode="lines",
+    name="Forecasted DAU"
+)
+
+st.plotly_chart(
+    forecast_chart,
+    use_container_width=True
+)
+
+st.dataframe(
+    forecast_df,
     use_container_width=True
 )
 
