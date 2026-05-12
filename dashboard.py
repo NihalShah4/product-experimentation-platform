@@ -25,6 +25,8 @@ from src.insights import (
     generate_device_insight
 )
 
+from src.anomaly_detection import detect_dau_anomalies
+
 st.set_page_config(
     page_title="Product Experimentation Platform",
     layout="wide"
@@ -52,6 +54,7 @@ retention_df = get_retention_data()
 channel_df = get_conversion_by_channel()
 device_df = get_conversion_by_device()
 funnel_conversion_df = get_funnel_conversion()
+anomaly_df = detect_dau_anomalies()
 
 # Calculate metrics
 conversion_rate = conversion_df.iloc[0]["conversion_rate"]
@@ -124,6 +127,26 @@ dau_chart = px.line(
 
 st.plotly_chart(
     dau_chart,
+    use_container_width=True
+)
+
+st.subheader("DAU Anomaly Detection")
+
+anomaly_chart = px.scatter(
+    anomaly_df,
+    x="event_date",
+    y="dau",
+    color="is_anomaly",
+    title="Detected Anomalies in Daily Active Users"
+)
+
+st.plotly_chart(
+    anomaly_chart,
+    use_container_width=True
+)
+
+st.dataframe(
+    anomaly_df[anomaly_df["is_anomaly"]],
     use_container_width=True
 )
 
