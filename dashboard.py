@@ -22,7 +22,8 @@ from src.metrics import (
 from src.insights import (
     generate_experiment_insight,
     generate_channel_insight,
-    generate_device_insight
+    generate_device_insight,
+    generate_forecast_insight
 )
 
 from src.anomaly_detection import detect_dau_anomalies
@@ -58,6 +59,7 @@ device_df = get_conversion_by_device()
 funnel_conversion_df = get_funnel_conversion()
 anomaly_df = detect_dau_anomalies()
 historical_dau_df, forecast_df = forecast_dau()
+forecast_insight = generate_forecast_insight(forecast_df)
 
 # Calculate metrics
 conversion_rate = conversion_df.iloc[0]["conversion_rate"]
@@ -178,6 +180,8 @@ st.dataframe(
     forecast_df,
     use_container_width=True
 )
+
+st.info(forecast_insight)
 
 # Funnel chart
 funnel_chart = px.bar(

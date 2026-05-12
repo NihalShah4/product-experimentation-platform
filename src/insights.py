@@ -44,3 +44,13 @@ def generate_device_insight(device_df):
         f"demonstrate the strongest conversion behavior "
         f"at {best_device['conversion_rate'] * 100:.2f}%."
     )
+
+def generate_forecast_insight(forecast_df):
+
+    avg_forecast = forecast_df["forecasted_dau"].mean()
+
+    return (
+        f"Based on the latest 7-day rolling activity pattern, "
+        f"expected DAU for the next 14 days is approximately "
+        f"{avg_forecast:.0f} users per day."
+    )
