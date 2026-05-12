@@ -661,21 +661,33 @@ if "simulation_result" not in st.session_state:
     st.session_state["simulation_result"] = None
 
 # =========================================================
-# FILTERED ANALYTICS QUERY HELPERS
+# VARIANT FILTER CONSTRUCTION
 # =========================================================
-# These helper functions dynamically apply the selected
-# experiment variant to product metrics, funnel metrics,
-# segmentation, and retention calculations.
+# Builds a reusable SQL condition for the selected experiment
+# variant.
 #
-# Important:
-# Global experiment p-value and treatment lift are intentionally
-# computed using both control and treatment groups.
+# If "All" is selected, no filter is applied.
+# If "control" or "treatment" is selected, the condition is
+# injected into filtered product analytics queries.
+#
+# This keeps dashboard interactivity centralized and avoids
+# duplicating variant-filter logic inside every SQL query.
 
 def get_variant_condition(alias="e"):
     if selected_variant == "All":
         return ""
     return f"AND {alias}.variant = '{selected_variant}'"
 
+# =========================================================
+# FILTERED DAILY ACTIVE USERS
+# =========================================================
+# Computes Daily Active Users after applying the selected
+# experiment variant filter.
+#
+# Used by:
+# - Command Center DAU trend
+# - product health monitoring
+# - variant-level engagement comparison
 
 def get_filtered_dau():
     variant_condition = get_variant_condition("e")
@@ -693,6 +705,16 @@ def get_filtered_dau():
 
     return pd.read_sql(query, engine)
 
+# =========================================================
+# FILTERED CONVERSION RATE
+# =========================================================
+# Computes conversion rate for the selected dashboard scope.
+#
+# Conversion definition:
+# purchase sessions / session_start sessions
+#
+# NULLIF prevents division-by-zero errors when a filtered
+# segment has no sessions.
 
 def get_filtered_conversion_rate():
     variant_condition = get_variant_condition("e")
@@ -728,6 +750,14 @@ def get_filtered_conversion_rate():
 
     return pd.read_sql(query, engine)
 
+# =========================================================
+# FILTERED FUNNEL EVENT DISTRIBUTION
+# =========================================================
+# Counts product events across the funnel after applying the
+# selected variant filter.
+#
+# This supports visibility into how users move through:
+# session_start -> view_product -> add_to_cart -> purchase
 
 def get_filtered_funnel_metrics():
     variant_condition = get_variant_condition("e")
@@ -745,6 +775,18 @@ def get_filtered_funnel_metrics():
 
     return pd.read_sql(query, engine)
 
+# =========================================================
+# FILTERED FUNNEL CONVERSION ANALYSIS
+# =========================================================
+# Computes conversion and drop-off from the funnel entry point.
+#
+# session_start is used as the baseline denominator.
+#
+# Output columns:
+# - event_type
+# - sessions
+# - conversion_from_start
+# - dropoff_from_start
 
 def get_filtered_funnel_conversion():
     variant_condition = get_variant_condition("e")
@@ -795,6 +837,13 @@ def get_filtered_funnel_conversion():
 
     return df
 
+# =========================================================
+# FILTERED ACQUISITION CHANNEL ANALYSIS
+# =========================================================
+# Computes conversion performance by acquisition channel.
+#
+# Used to identify which marketing/source channels generate
+# the highest-quality traffic under the selected variant scope.
 
 def get_filtered_conversion_by_channel():
     variant_condition = get_variant_condition("e")
@@ -837,6 +886,13 @@ def get_filtered_conversion_by_channel():
 
     return pd.read_sql(query, engine)
 
+# =========================================================
+# FILTERED DEVICE SEGMENT ANALYSIS
+# =========================================================
+# Computes conversion performance by device type.
+#
+# Used to evaluate whether desktop, mobile, or tablet users
+# convert more effectively under the selected variant scope.
 
 def get_filtered_conversion_by_device():
     variant_condition = get_variant_condition("e")
@@ -879,6 +935,17 @@ def get_filtered_conversion_by_device():
 
     return pd.read_sql(query, engine)
 
+# =========================================================
+# FILTERED WEEKLY COHORT RETENTION
+# =========================================================
+# Computes weekly retention by signup cohort.
+#
+# Retention logic:
+# - users are grouped by signup week
+# - later activity is mapped to weeks since signup
+# - active users are divided by original cohort size
+#
+# This supports product stickiness and engagement analysis.
 
 def get_filtered_retention_data():
     variant_condition = get_variant_condition("e")
@@ -935,8 +1002,20 @@ def get_filtered_retention_data():
 # =========================================================
 # DATA LOADING + METRIC COMPUTATION
 # =========================================================
-# Loads filtered analytics outputs from PostgreSQL and computes
-# global experiment metrics used throughout the dashboard.
+# The following calls execute the dashboard's core analytical
+# queries.
+#
+# Filtered metrics respect the sidebar variant selector:
+# - DAU
+# - conversion rate
+# - funnel metrics
+# - channel segmentation
+# - device segmentation
+# - retention
+#
+# Global experiment metrics intentionally ignore the sidebar
+# filter because p-value and treatment lift require both
+# control and treatment groups.
 
 dau_df = get_filtered_dau()
 conversion_df = get_filtered_conversion_rate()
