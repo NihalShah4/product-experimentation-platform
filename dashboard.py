@@ -27,8 +27,10 @@ from src.insights import (
 )
 
 from src.anomaly_detection import detect_dau_anomalies
-
 from src.forecasting import forecast_dau
+from src.query_assistant import answer_query
+from src.llm_assistant import generate_llm_response
+
 
 st.set_page_config(
     page_title="Product Experimentation Platform",
@@ -59,7 +61,6 @@ device_df = get_conversion_by_device()
 funnel_conversion_df = get_funnel_conversion()
 anomaly_df = detect_dau_anomalies()
 historical_dau_df, forecast_df = forecast_dau()
-forecast_insight = generate_forecast_insight(forecast_df)
 
 # Calculate metrics
 conversion_rate = conversion_df.iloc[0]["conversion_rate"]
@@ -78,18 +79,48 @@ lift = (
     / control_rate
 ) * 100
 
+# Generate insights
+forecast_insight = generate_forecast_insight(forecast_df)
+
 experiment_insight = generate_experiment_insight(
-        p_value,
-        lift
-    )
+    p_value,
+    lift
+)
 
 channel_insight = generate_channel_insight(
-        channel_df
-    )
+    channel_df
+)
 
 device_insight = generate_device_insight(
-        device_df
-    )
+    device_df
+)
+
+analytics_context = f"""
+Overall conversion rate: {conversion_rate:.2%}
+
+Control conversion rate: {control_rate:.2%}
+
+Treatment conversion rate: {treatment_rate:.2%}
+
+Experiment p-value: {p_value:.4f}
+
+Treatment lift: {lift:.2f}%
+
+Top acquisition channel:
+{channel_df.iloc[0]['acquisition_channel']}
+
+Top acquisition channel conversion rate:
+{channel_df.iloc[0]['conversion_rate']:.2%}
+
+Top device segment:
+{device_df.iloc[0]['device_type']}
+
+Top device conversion rate:
+{device_df.iloc[0]['conversion_rate']:.2%}
+
+Average 14-day forecasted DAU:
+{forecast_df['forecasted_dau'].mean():.0f}
+"""
 
 # KPI cards
 col1, col2, col3, col4 = st.columns(4)
@@ -117,10 +148,47 @@ col4.metric(
 st.header("Executive Insights")
 
 st.info(experiment_insight)
-
 st.success(channel_insight)
-
 st.warning(device_insight)
+
+st.header("AI Analytics Assistant")
+
+user_query = st.text_input(
+    "Ask a product analytics question",
+    placeholder="Example: What is the conversion rate?"
+)
+
+if user_query:
+    response = answer_query(user_query)
+
+    if hasattr(response, "to_dict"):
+        st.dataframe(
+            response,
+            use_container_width=True
+        )
+    else:
+        st.info(response)
+
+st.header("LLM Product Analytics Assistant")
+
+llm_query = st.text_area(
+    "Ask strategic analytics questions",
+    placeholder="Example: Why is the experiment underperforming?"
+)
+
+if st.button("Generate AI Insight"):
+
+    if not llm_query.strip():
+        st.warning("Enter a question before generating an insight.")
+    else:
+        with st.spinner("Generating insight..."):
+
+            llm_response = generate_llm_response(
+                llm_query,
+                analytics_context
+            )
+
+            st.success(llm_response)
 
 # DAU chart
 dau_chart = px.line(
