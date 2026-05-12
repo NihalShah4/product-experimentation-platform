@@ -1,3 +1,37 @@
+"""
+dashboard.py
+
+Product Intelligence Platform
+
+Purpose:
+This is the main Streamlit application for the Product Intelligence Platform.
+It combines product analytics, experimentation, forecasting, anomaly detection,
+guarded simulation, and LLM-assisted executive insights into one interactive
+dashboard.
+
+Core Modules:
+- Executive KPI monitoring
+- Product funnel analytics
+- A/B experiment evaluation
+- Acquisition and device segmentation
+- Weekly cohort retention
+- DAU forecasting
+- DAU anomaly detection
+- Guarded synthetic data simulation
+- Rule-based and LLM-powered analytics assistants
+
+Architecture:
+- Streamlit handles the user interface
+- PostgreSQL stores synthetic product-event data
+- pandas executes SQL result processing
+- Plotly renders interactive visualizations
+- scikit-learn supports anomaly detection
+- OpenAI powers strategic interpretation through the LLM assistant
+
+Design Intent:
+This app is built to simulate an internal executive-facing product analytics
+system, not a simple notebook dashboard.
+"""
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -30,6 +64,14 @@ st.set_page_config(
     page_title="Product Intelligence Platform",
     layout="wide"
 )
+
+# =========================================================
+# GLOBAL PAGE STYLING
+# =========================================================
+# Custom CSS is used to move beyond default Streamlit styling.
+# The goal is to create an executive-grade analytics interface
+# with premium visual hierarchy, dark theme, KPI cards, tabs,
+# chart containers, and product-style interaction patterns.
 
 st.markdown(
     """
@@ -576,6 +618,13 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# =========================================================
+# SIDEBAR CONTROLS
+# =========================================================
+# Sidebar controls define global dashboard filters and expose
+# platform modules. The experiment variant selector controls
+# filtered product metrics while global A/B comparison metrics
+# intentionally remain unfiltered.
 
 st.sidebar.markdown("## Analytics Controls")
 
@@ -598,11 +647,29 @@ st.sidebar.markdown(
     """
 )
 
+# =========================================================
+# SESSION STATE GUARDRAILS
+# =========================================================
+# Streamlit session state is used to prevent repeated database
+# regeneration during a single app session. This protects the
+# simulation workflow from uncontrolled repeated writes.
+
 if "simulation_generated" not in st.session_state:
     st.session_state["simulation_generated"] = False
     
 if "simulation_result" not in st.session_state:
     st.session_state["simulation_result"] = None
+
+# =========================================================
+# FILTERED ANALYTICS QUERY HELPERS
+# =========================================================
+# These helper functions dynamically apply the selected
+# experiment variant to product metrics, funnel metrics,
+# segmentation, and retention calculations.
+#
+# Important:
+# Global experiment p-value and treatment lift are intentionally
+# computed using both control and treatment groups.
 
 def get_variant_condition(alias="e"):
     if selected_variant == "All":
@@ -865,8 +932,12 @@ def get_filtered_retention_data():
 
     return pd.read_sql(query, engine)
 
+# =========================================================
+# DATA LOADING + METRIC COMPUTATION
+# =========================================================
+# Loads filtered analytics outputs from PostgreSQL and computes
+# global experiment metrics used throughout the dashboard.
 
-# Load data
 dau_df = get_filtered_dau()
 conversion_df = get_filtered_conversion_rate()
 funnel_df = get_filtered_funnel_metrics()

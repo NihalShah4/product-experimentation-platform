@@ -1,3 +1,44 @@
+"""
+simulation_engine.py
+
+Purpose:
+Provides guarded synthetic data generation for the
+Product Intelligence Platform.
+
+Core Responsibilities:
+- generate synthetic users
+- generate behavioral product events
+- simulate experimentation traffic
+- populate PostgreSQL dynamically
+- support controlled simulation workflows
+
+Design Philosophy:
+This module intentionally demonstrates:
+- analytics system simulation
+- database write operations
+- guardrail enforcement
+- controlled randomness
+- synthetic experimentation environments
+
+Why Guardrails Matter:
+The simulation system intentionally limits:
+- user volume
+- date range
+- generation frequency
+
+This mirrors real-world production safeguards where
+unrestricted data generation could:
+- overload infrastructure
+- corrupt analytics environments
+- create operational instability
+
+Key Guardrail:
+User-selected volume acts as an upper bound.
+Actual generated volume is randomized between
+90–100% of the selected cap to simulate realistic
+traffic variability.
+"""
+
 import random
 import uuid
 from datetime import datetime, timedelta
@@ -7,17 +48,41 @@ import pandas as pd
 from src.metrics import engine
 
 
+# =========================================================
+# SYNTHETIC DATA GENERATION ENGINE
+# =========================================================
+
 def generate_simulation_data(
     max_users,
     date_range_days
 ):
     """
-    Generates synthetic product analytics data with guardrails.
+    Generates guarded synthetic analytics data and
+    inserts it into PostgreSQL.
 
-    User-selected max_users is treated as an upper bound.
-    Actual generated users are randomized between 90% and 100%
-    of the selected value to simulate realistic variation.
+    Parameters:
+        max_users (int):
+            Maximum user generation cap.
+
+        date_range_days (int):
+            Simulation time horizon.
+
+    Returns:
+        dict:
+            requested_max_users
+            actual_users
+            events_generated
+            date_range_days
     """
+
+    # =====================================================
+    # RANDOMIZED USER VOLUME
+    # =====================================================
+    #
+    # The requested user count is intentionally treated
+    # as a ceiling rather than an exact target.
+    #
+    # This creates more realistic simulation variance.
 
     random.seed()
 
@@ -25,6 +90,10 @@ def generate_simulation_data(
         int(max_users * 0.90),
         max_users
     )
+
+    # =====================================================
+    # SYNTHETIC SEGMENT DEFINITIONS
+    # =====================================================
 
     countries = [
         "USA",
@@ -53,10 +122,17 @@ def generate_simulation_data(
     users = []
     events = []
 
+    # =====================================================
+    # USER GENERATION LOOP
+    # =====================================================
+
     for user_id in range(1, actual_users + 1):
 
         signup_date = start_date + timedelta(
-            days=random.randint(0, date_range_days - 1)
+            days=random.randint(
+                0,
+                date_range_days - 1
+            )
         )
 
         country = random.choice(countries)
@@ -71,6 +147,13 @@ def generate_simulation_data(
             "device_type": device
         })
 
+        # =================================================
+        # USER ENGAGEMENT SIMULATION
+        # =================================================
+        #
+        # Users are assigned multiple active days
+        # to create retention + engagement behavior.
+
         active_days = random.randint(
             1,
             min(20, date_range_days)
@@ -79,14 +162,25 @@ def generate_simulation_data(
         for _ in range(active_days):
 
             event_date = signup_date + timedelta(
-                days=random.randint(0, date_range_days)
+                days=random.randint(
+                    0,
+                    date_range_days
+                )
             )
 
             session_id = str(uuid.uuid4())
 
+            # =============================================
+            # EXPERIMENT ASSIGNMENT
+            # =============================================
+
             variant = random.choice(
                 ["control", "treatment"]
             )
+
+            # =============================================
+            # SESSION START EVENT
+            # =============================================
 
             events.append({
                 "user_id": user_id,
@@ -97,7 +191,12 @@ def generate_simulation_data(
                 "variant": variant
             })
 
+            # =============================================
+            # PRODUCT VIEW EVENT
+            # =============================================
+
             if random.random() < 0.65:
+
                 events.append({
                     "user_id": user_id,
                     "event_date": event_date.date(),
@@ -107,7 +206,12 @@ def generate_simulation_data(
                     "variant": variant
                 })
 
+            # =============================================
+            # ADD-TO-CART EVENT
+            # =============================================
+
             if random.random() < 0.35:
+
                 events.append({
                     "user_id": user_id,
                     "event_date": event_date.date(),
@@ -116,6 +220,18 @@ def generate_simulation_data(
                     "experiment_id": 1,
                     "variant": variant
                 })
+
+            # =============================================
+            # PURCHASE CONVERSION LOGIC
+            # =============================================
+            #
+            # Synthetic business assumptions:
+            #
+            # - email traffic converts better
+            # - desktop traffic converts better
+            # - treatment variant slightly underperforms
+            #
+            # This creates meaningful analytical variation.
 
             conversion_prob = 0.08
 
@@ -128,7 +244,12 @@ def generate_simulation_data(
             if variant == "treatment":
                 conversion_prob -= 0.002
 
+            # =============================================
+            # PURCHASE EVENT
+            # =============================================
+
             if random.random() < conversion_prob:
+
                 events.append({
                     "user_id": user_id,
                     "event_date": event_date.date(),
@@ -138,8 +259,17 @@ def generate_simulation_data(
                     "variant": variant
                 })
 
+    # =====================================================
+    # DATAFRAME CONVERSION
+    # =====================================================
+
     users_df = pd.DataFrame(users)
+
     events_df = pd.DataFrame(events)
+
+    # =====================================================
+    # EXPERIMENT METADATA
+    # =====================================================
 
     experiments_df = pd.DataFrame([
         {
@@ -148,7 +278,9 @@ def generate_simulation_data(
             "variant": "control",
             "start_date": start_date.date(),
             "end_date": (
-                start_date + timedelta(days=date_range_days)
+                start_date + timedelta(
+                    days=date_range_days
+                )
             ).date()
         },
         {
@@ -157,15 +289,37 @@ def generate_simulation_data(
             "variant": "treatment",
             "start_date": start_date.date(),
             "end_date": (
-                start_date + timedelta(days=date_range_days)
+                start_date + timedelta(
+                    days=date_range_days
+                )
             ).date()
         }
     ])
 
+    # =====================================================
+    # DATABASE RESET
+    # =====================================================
+    #
+    # Existing synthetic records are removed before
+    # new simulation insertion.
+    #
+    # CASCADE ensures dependent rows are safely removed.
+
     with engine.begin() as connection:
+
         connection.exec_driver_sql(
-            "TRUNCATE TABLE events, experiments, users RESTART IDENTITY CASCADE;"
+            """
+            TRUNCATE TABLE
+                events,
+                experiments,
+                users
+            RESTART IDENTITY CASCADE;
+            """
         )
+
+    # =====================================================
+    # DATABASE INSERTION
+    # =====================================================
 
     users_df.to_sql(
         "users",
@@ -187,6 +341,10 @@ def generate_simulation_data(
         if_exists="append",
         index=False
     )
+
+    # =====================================================
+    # EXECUTION SUMMARY
+    # =====================================================
 
     return {
         "requested_max_users": max_users,
