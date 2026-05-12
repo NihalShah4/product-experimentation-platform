@@ -15,7 +15,8 @@ from src.metrics import (
     get_conversion_rate,
     get_funnel_metrics,
     get_conversion_by_channel,
-    get_conversion_by_device
+    get_conversion_by_device,
+    get_funnel_conversion
 )
 
 from src.insights import (
@@ -50,6 +51,7 @@ experiment_df = get_experiment_results()
 retention_df = get_retention_data()
 channel_df = get_conversion_by_channel()
 device_df = get_conversion_by_device()
+funnel_conversion_df = get_funnel_conversion()
 
 # Calculate metrics
 conversion_rate = conversion_df.iloc[0]["conversion_rate"]
@@ -135,6 +137,35 @@ funnel_chart = px.bar(
 
 st.plotly_chart(
     funnel_chart,
+    use_container_width=True
+)
+
+st.subheader("Funnel Conversion from Session Start")
+
+funnel_conversion_chart = px.bar(
+    funnel_conversion_df,
+    x="event_type",
+    y="conversion_from_start",
+    title="Funnel Conversion Rate by Step",
+    text="conversion_from_start"
+)
+
+funnel_conversion_chart.update_traces(
+    texttemplate="%{text:.1%}",
+    textposition="outside"
+)
+
+funnel_conversion_chart.update_layout(
+    yaxis_tickformat=".0%"
+)
+
+st.plotly_chart(
+    funnel_conversion_chart,
+    use_container_width=True
+)
+
+st.dataframe(
+    funnel_conversion_df,
     use_container_width=True
 )
 

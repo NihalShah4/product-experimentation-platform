@@ -142,3 +142,47 @@ def get_conversion_by_device():
     """
 
     return pd.read_sql(query, engine)
+
+def get_funnel_conversion():
+
+    query = """
+    WITH funnel AS (
+        SELECT
+            event_type,
+            COUNT(DISTINCT session_id) AS sessions
+        FROM events
+        WHERE event_type IN (
+            'session_start',
+            'view_product',
+            'add_to_cart',
+            'purchase'
+        )
+        GROUP BY event_type
+    )
+
+    SELECT
+        event_type,
+        sessions
+    FROM funnel
+    ORDER BY
+        CASE event_type
+            WHEN 'session_start' THEN 1
+            WHEN 'view_product' THEN 2
+            WHEN 'add_to_cart' THEN 3
+            WHEN 'purchase' THEN 4
+        END
+    """
+
+    df = pd.read_sql(query, engine)
+
+    baseline = df["sessions"].iloc[0]
+
+    df["conversion_from_start"] = (
+        df["sessions"] / baseline
+    ).round(4)
+
+    df["dropoff_from_start"] = (
+        1 - df["conversion_from_start"]
+    ).round(4)
+
+    return df
