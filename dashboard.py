@@ -1108,6 +1108,49 @@ st.markdown(
 )
 
 # =========================================================
+# DYNAMIC KPI TREND LABELS
+# =========================================================
+
+conversion_trend_class = (
+    "trend-positive"
+    if conversion_rate >= control_rate
+    else "trend-negative"
+)
+
+conversion_trend_text = (
+    f"▲ {(conversion_rate - control_rate) * 100:.2f} pts vs control"
+    if conversion_rate >= control_rate
+    else f"▼ {(conversion_rate - control_rate) * 100:.2f} pts vs control"
+)
+
+events_trend_text = f"● {total_events:,} filtered events"
+events_trend_class = "trend-neutral"
+
+p_value_trend_class = (
+    "trend-positive"
+    if p_value < 0.05
+    else "trend-neutral"
+)
+
+p_value_trend_text = (
+    "● Statistically significant"
+    if p_value < 0.05
+    else "● Not statistically significant"
+)
+
+lift_trend_class = (
+    "trend-positive"
+    if lift > 0
+    else "trend-negative"
+)
+
+lift_trend_text = (
+    f"▲ {lift:.2f}% treatment improvement"
+    if lift > 0
+    else f"▼ {lift:.2f}% treatment decline"
+)
+
+# =========================================================
 # EXECUTIVE KPI CARDS
 # =========================================================
 # Displays the highest-priority product and experiment metrics
@@ -1127,7 +1170,7 @@ with col1:
 <div class="kpi-card">
     <div class="kpi-label">Conversion Rate</div>
     <div class="kpi-value">{conversion_rate:.2%}</div>
-    <div class="trend-positive">▲ +1.8% vs previous period</div>
+    <div class="{conversion_trend_class}">{conversion_trend_text}</div>
     <div class="kpi-note">Selected Variant: {selected_variant}</div>
 </div>
 ''',
@@ -1140,7 +1183,7 @@ with col2:
 <div class="kpi-card">
     <div class="kpi-label">Total Events</div>
     <div class="kpi-value">{total_events:,}</div>
-    <div class="trend-positive">▲ +12.4% activity growth</div>
+    <div class="{events_trend_class}">{events_trend_text}</div>
     <div class="kpi-note">Filtered product activity</div>
 </div>
 ''',
@@ -1153,7 +1196,7 @@ with col3:
 <div class="kpi-card">
     <div class="kpi-label">Experiment P-Value</div>
     <div class="kpi-value">{p_value:.4f}</div>
-    <div class="trend-neutral">● Statistical confidence unchanged</div>
+    <div class="{p_value_trend_class}">{p_value_trend_text}</div>
     <div class="kpi-note">Global A/B comparison</div>
 </div>
 ''',
@@ -1166,7 +1209,7 @@ with col4:
 <div class="kpi-card">
     <div class="kpi-label">Treatment Lift</div>
     <div class="kpi-value">{lift:.2f}%</div>
-    <div class="trend-negative">▼ -2.1% experiment decline</div>
+    <div class="{lift_trend_class}">{lift_trend_text}</div>
     <div class="kpi-note">Treatment vs control</div>
 </div>
 ''',
