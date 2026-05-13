@@ -40,12 +40,9 @@ from sqlalchemy import create_engine
 
 load_dotenv()
 
-DB_PASSWORD = os.getenv("DB_PASSWORD")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-engine = create_engine(
-    f"postgresql://postgres:{DB_PASSWORD}@localhost:5432/product_analytics"
-)
-
+engine = create_engine(DATABASE_URL)
 
 # =========================================================
 # DAILY ACTIVE USERS (DAU)
