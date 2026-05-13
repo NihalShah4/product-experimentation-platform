@@ -1091,6 +1091,11 @@ Average 14-day forecasted DAU:
 {forecast_df['forecasted_dau'].mean():.0f}
 """
 
+# =========================================================
+# HERO SECTION
+# =========================================================
+# Introduces the platform as an executive-facing product
+# intelligence system rather than a simple analytics dashboard.
 
 st.markdown(
     """
@@ -1102,6 +1107,17 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# =========================================================
+# EXECUTIVE KPI CARDS
+# =========================================================
+# Displays the highest-priority product and experiment metrics
+# in a leadership-readable format.
+#
+# These cards are designed to communicate:
+# - current product conversion
+# - event volume
+# - experiment confidence
+# - treatment performance
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -1167,6 +1183,11 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# =========================================================
+# EXECUTIVE DECISION SUMMARY
+# =========================================================
+# Converts analytical outputs into concise business-facing
+# interpretations for stakeholders.
 
 st.markdown('<div class="section-title">Executive Decision Summary</div>', unsafe_allow_html=True)
 st.markdown('<div class="section-subtitle">Automated interpretation of experimentation, segment performance, and product behavior.</div>', unsafe_allow_html=True)
@@ -1174,6 +1195,12 @@ st.markdown('<div class="section-subtitle">Automated interpretation of experimen
 st.markdown(f'<div class="insight-card-blue">{experiment_insight}</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="insight-card-green">{channel_insight}</div>', unsafe_allow_html=True)
 st.markdown(f'<div class="insight-card-amber">{device_insight}</div>', unsafe_allow_html=True)
+
+# =========================================================
+# STRATEGIC RECOMMENDATIONS
+# =========================================================
+# Provides leadership-facing next-best actions based on
+# experiment results, segment performance, and forecast risk.
 
 st.markdown(
     '<div class="section-title">Strategic Recommendations</div>',
@@ -1223,6 +1250,13 @@ Forecasted DAU is approximately {forecast_df['forecasted_dau'].mean():.0f} users
 
 st.markdown(strategy_html, unsafe_allow_html=True)
 
+# =========================================================
+# PRIMARY DASHBOARD NAVIGATION
+# =========================================================
+# Tabs organize the platform into executive product modules:
+# simulation, health monitoring, experimentation, growth,
+# retention, and AI-assisted analytics.
+
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
     [
         "Simulation Lab",
@@ -1233,6 +1267,22 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(
         "AI Copilot"        
     ]
 )
+
+# =========================================================
+# SIMULATION LAB TAB
+# =========================================================
+# Provides controlled synthetic data generation for demo and
+# testing workflows.
+#
+# Guardrails:
+# - capped user generation
+# - capped date range
+# - randomized actual user count
+# - one generation per Streamlit session
+# - synthetic data only
+#
+# This demonstrates safe database write operations and
+# simulation-driven analytics testing.
 
 with tab1:
     st.markdown(
@@ -1283,6 +1333,9 @@ with tab1:
         unsafe_allow_html=True
     )
 
+# Generation is disabled after one successful run to prevent
+# repeated database resets within the same session.
+
     generate_button = st.button(
         "Generate New Simulation",
         disabled=st.session_state["simulation_generated"]
@@ -1293,14 +1346,19 @@ with tab1:
         with st.spinner(
             "Generating synthetic product-event data and updating PostgreSQL..."
         ):
-
+            
+            # Generates synthetic users/events and writes them into
+            # PostgreSQL after clearing the existing synthetic dataset.
             result = generate_simulation_data(
                 max_users=selected_user_cap,
                 date_range_days=selected_date_range
             )
 
+            # Persist simulation results in session state so they remain
+            # visible after Streamlit reruns the app.
             st.session_state["simulation_result"] = result
             st.session_state["simulation_generated"] = True
+            # Force immediate rerun so the button lock is applied visually.
             st.rerun()
 
             st.success(
@@ -1342,6 +1400,7 @@ with tab1:
                 "Data has been regenerated. Refresh the page to reload all dashboard metrics from the updated database."
             )
     
+    # Displays the persisted simulation summary after rerun.
     if st.session_state["simulation_result"] is not None:
         result = st.session_state["simulation_result"]
 
@@ -1388,6 +1447,12 @@ with tab1:
         st.info(
             "Simulation generation is locked for this session to prevent repeated database resets."
         )
+
+# =========================================================
+# COMMAND CENTER TAB
+# =========================================================
+# Monitors product health through DAU trends, anomaly detection,
+# and short-term forecasting.
 
 with tab2:
     st.markdown('<div class="section-title">Product Health Command Center</div>', unsafe_allow_html=True)
@@ -1470,6 +1535,11 @@ with tab2:
 
     st.markdown(f'<div class="insight-card-blue">{forecast_insight}</div>', unsafe_allow_html=True)
 
+# =========================================================
+# EXPERIMENTATION TAB
+# =========================================================
+# Supports A/B test interpretation, rollout decisions, funnel
+# performance, and conversion drop-off analysis.
 
 with tab3:
     st.markdown('<div class="section-title">Experimentation Intelligence</div>', unsafe_allow_html=True)
@@ -1569,6 +1639,11 @@ with tab3:
             use_container_width=True
         )
 
+# =========================================================
+# GROWTH SEGMENTS TAB
+# =========================================================
+# Compares conversion performance across acquisition channels
+# and device segments.
 
 with tab4:
     st.markdown('<div class="section-title">Growth Segment Intelligence</div>', unsafe_allow_html=True)
@@ -1621,6 +1696,11 @@ with tab4:
         st.subheader("Device Performance")
         st.dataframe(device_df, use_container_width=True)
 
+# =========================================================
+# RETENTION TAB
+# =========================================================
+# Visualizes weekly cohort retention to evaluate user stickiness
+# and post-signup engagement quality.
 
 with tab5:
     st.markdown('<div class="section-title">Retention Intelligence</div>', unsafe_allow_html=True)
@@ -1657,6 +1737,15 @@ with tab5:
         use_container_width=True
     )
 
+# =========================================================
+# AI COPILOT TAB
+# =========================================================
+# Combines deterministic analytics lookup with LLM-powered
+# strategic interpretation.
+#
+# The rule-based assistant returns direct metric answers.
+# The LLM assistant uses structured analytics context to
+# generate executive-style recommendations.
 
 with tab6:
     st.markdown(
@@ -1684,7 +1773,8 @@ with tab6:
         "Ask a product analytics question",
         placeholder="Example: What happened in the experiment?"
     )
-
+    
+    # Rule-based analytics assistant for deterministic metric lookup.
     if user_query:
         response = answer_query(user_query)
 
@@ -1700,7 +1790,10 @@ with tab6:
         "Ask strategic analytics questions",
         placeholder="Example: Why is the experiment underperforming?"
     )
-
+    
+    # LLM-powered executive insight generation.
+    # Numeric metrics are computed outside the LLM and injected
+    # as structured context to reduce hallucination risk.
     if st.button("Generate Executive AI Insight"):
 
         if not llm_query.strip():
@@ -1715,6 +1808,11 @@ with tab6:
 
                 st.success(llm_response)
 
+# =========================================================
+# PLATFORM ARCHITECTURE FOOTER
+# =========================================================
+# Summarizes the technical and business scope of the platform
+# for reviewers, recruiters, and stakeholders.
 
 footer_html = """
 <div class="footer-panel">
