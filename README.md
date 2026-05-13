@@ -182,67 +182,73 @@ This module demonstrates:
 
 ## Executive Dashboard
 
-![Executive Dashboard](./assets/executive_dashboard.png)
+![Executive Dashboard](assets/screenshots/dashboard-overview.png)
+
+---
+
+## Sidebar / Platform Modules
+
+![Sidebar Navigation](assets/screenshots/sidebar-navigation.png)
 
 ---
 
 ## Strategic Recommendations
 
-![Strategic Recommendations](./assets/strategic_recommendations.png)
+![Strategic Recommendations](assets/screenshots/strategic-recommendations.png)
 
 ---
 
 ## Simulation Lab
 
-![Simulation Lab](./assets/simulation_lab.png)
+![Simulation Lab](assets/screenshots/simulation-lab.png)
 
 ---
 
 ## Product Health Command Center
 
-![Command Center](./assets/command_center.png)
+![Product Health Command Center](assets/screenshots/command-center.png)
 
 ---
 
 ## DAU Forecasting & Anomaly Detection
 
-![Forecasting](./assets/forecasting.png)
+![Forecasting & Anomaly Detection](assets/screenshots/forecasting-anomaly-detection.png)
 
 ---
 
 ## Experimentation Intelligence
 
-![Experimentation](./assets/experimentation.png)
+![Experimentation Intelligence](assets/screenshots/experimentation-intelligence.png)
 
 ---
 
 ## Funnel Intelligence
 
-![Funnel Analytics](./assets/funnel_analytics.png)
+![Funnel Intelligence](assets/screenshots/funnel-intelligence.png)
 
 ---
 
 ## Growth Segment Intelligence
 
-![Growth Segments](./assets/growth_segments.png)
+![Growth Segment Intelligence](assets/screenshots/growth-segments.png)
 
 ---
 
 ## Retention Intelligence
 
-![Retention](./assets/retention.png)
+![Retention Intelligence](assets/screenshots/retention-intelligence.png)
 
 ---
 
 ## AI Product Analytics Copilot
 
-![AI Copilot](./assets/ai_copilot.png)
+![AI Copilot](assets/screenshots/ai-copilot.png)
 
 ---
 
 ## Platform Architecture
 
-![Architecture](./assets/platform_architecture.png)
+![Platform Architecture](assets/screenshots/platform-architecture.png)
 
 ---
 
