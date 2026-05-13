@@ -9,3 +9,5 @@ plotly
 statsmodels
 scikit-learn
 xgboost
+openai
+python-dotenv
