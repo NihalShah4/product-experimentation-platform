@@ -182,73 +182,73 @@ This module demonstrates:
 
 ## Executive Dashboard
 
-![Executive Dashboard](assets/screenshots/dashboard-overview.png)
+![Executive Dashboard](assets/screenshots/dashboard-overview.png.png)
 
 ---
 
 ## Sidebar / Platform Modules
 
-![Sidebar Navigation](assets/screenshots/sidebar-navigation.png)
+![Sidebar Navigation](assets/screenshots/sidebar-navigation.png.png)
 
 ---
 
 ## Strategic Recommendations
 
-![Strategic Recommendations](assets/screenshots/strategic-recommendations.png)
+![Strategic Recommendations](assets/screenshots/strategic-recommendations.png.png)
 
 ---
 
 ## Simulation Lab
 
-![Simulation Lab](assets/screenshots/simulation-lab.png)
+![Simulation Lab](assets/screenshots/simulation-lab.png.png)
 
 ---
 
 ## Product Health Command Center
 
-![Product Health Command Center](assets/screenshots/command-center.png)
+![Product Health Command Center](assets/screenshots/command-center.png.png)
 
 ---
 
 ## DAU Forecasting & Anomaly Detection
 
-![Forecasting & Anomaly Detection](assets/screenshots/forecasting-anomaly-detection.png)
+![Forecasting & Anomaly Detection](assets/screenshots/forecasting-anomaly-detection.png.png)
 
 ---
 
 ## Experimentation Intelligence
 
-![Experimentation Intelligence](assets/screenshots/experimentation-intelligence.png)
+![Experimentation Intelligence](assets/screenshots/experimentation-intelligence.png.png)
 
 ---
 
 ## Funnel Intelligence
 
-![Funnel Intelligence](assets/screenshots/funnel-intelligence.png)
+![Funnel Intelligence](assets/screenshots/funnel-intelligence.png.png)
 
 ---
 
 ## Growth Segment Intelligence
 
-![Growth Segment Intelligence](assets/screenshots/growth-segments.png)
+![Growth Segment Intelligence](assets/screenshots/growth-segments.png.png)
 
 ---
 
 ## Retention Intelligence
 
-![Retention Intelligence](assets/screenshots/retention-intelligence.png)
+![Retention Intelligence](assets/screenshots/retention-intelligence.png.png)
 
 ---
 
 ## AI Product Analytics Copilot
 
-![AI Copilot](assets/screenshots/ai-copilot.png)
+![AI Copilot](assets/screenshots/ai-copilot.png.png)
 
 ---
 
 ## Platform Architecture
 
-![Platform Architecture](assets/screenshots/platform-architecture.png)
+![Platform Architecture](assets/screenshots/platform-architecture.png.png)
 
 ---
 
